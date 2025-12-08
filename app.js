@@ -3,8 +3,9 @@ import { loadGrillState, performDataReset, setManualThemePreference, setSunData,
 import { getCurrentDateFormatted, showToast } from './js/utils.js';
 import { updateAllDisplays, applyTheme, cycleTheme, toggleFullscreen, updateFullscreenButton, elements } from './js/ui.js';
 import { areInitialStocksSet } from './js/calculations.js';
-import { processSyncQueue, updateSyncStatusIcon } from './js/sync.js';
-import { handleTableClick, showStockInputDialog, showDailyCloseDialog, showOpenTablesWarningDialog, hasOpenTables, showAdminDialog, showDispatchConfirmDialog, showStockNotSetWarningDialog } from './js/dialogs.js';
+import { processSyncQueue, updateSyncStatusIcon, fetchMenuConfigFromGAS } from './js/sync.js';
+// Importujeme showConfirmationDialog
+import { handleTableClick, showStockInputDialog, showDailyCloseDialog, showOpenTablesWarningDialog, hasOpenTables, showAdminDialog, showDispatchConfirmDialog, showStockNotSetWarningDialog, showConfirmationDialog } from './js/dialogs.js';
 
 // Inicializace po načtení DOM
 document.addEventListener('DOMContentLoaded', () => {
@@ -28,6 +29,11 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.fullscreenBtn.addEventListener('click', toggleFullscreen);
     }
 
+    // Listener pro nové tlačítko stažení konfigurace
+    document.getElementById('config-fetch-trigger')?.addEventListener('click', () => {
+        fetchMenuConfigFromGAS();
+    });
+
     elements.tables.forEach(table => { 
         table.addEventListener('click', function() { handleTableClick(this.id, this.textContent); }); 
         table.addEventListener('keydown', function(e) { 
@@ -45,11 +51,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('reset-local-data')?.addEventListener('click', () => {
-        if(confirm('Opravdu vynulovat všechna data (tržby, stoly, zásoby)? Nastavení menu zůstane.')) {
-            performDataReset(false);
-            updateAllDisplays();
-            showToast('Lokální data byla úspěšně vynulována.', 'success');
-        }
+        // ZMĚNA: Přidán nadpis "Vynulovat data?"
+        showConfirmationDialog(
+            'Vynulovat data?', 
+            'Opravdu vynulovat všechna data (tržby, stoly, zásoby)?<br>Nastavení menu zůstane zachováno.',
+            () => {
+                performDataReset(false);
+                updateAllDisplays();
+                showToast('Lokální data byla úspěšně vynulována.', 'success');
+            }
+        );
     });
 
     document.getElementById('enter-stock-button')?.addEventListener('click', showStockInputDialog);
@@ -84,7 +95,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // 5. První vykreslení a start sync
     updateAllDisplays();
     updateSyncStatusIcon();
+    
+    // Spuštění synchronizační fronty (odesílání)
     setTimeout(processSyncQueue, 2000);
+
+    // Automatické stažení konfigurace při startu
+    setTimeout(() => {
+        console.log("Pokus o automatické stažení konfigurace...");
+        fetchMenuConfigFromGAS();
+    }, 1000);
 });
 
 // --- Theme Helpers ---

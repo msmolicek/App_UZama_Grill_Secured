@@ -1,0 +1,429 @@
+/* --- DESIGN SYSTEM - BASE (Layout, Variables, Typography) --- */
+
+:root {
+    --font-main: 'Roboto', sans-serif;
+    
+    /* Barvy - Světlý režim */
+    --c-primary: #28a745; --c-primary-hover: #218838;
+    --c-secondary: #6c757d; --c-secondary-hover: #5a6268;
+    --c-danger: #dc3545; --c-danger-hover: #c82333;
+    --c-warning: #ffc107; --c-warning-hover: #e0a800;
+    --c-info: #17a2b8; --c-info-hover: #138496;
+    
+    --c-blue-tables: #90caf9;
+    --c-green-tables: #a5d6a7;
+    
+    --c-order-item-bg: #ede8d0;
+    --c-order-item-hover-bg: #e4dac4;
+    --c-order-item-text: #333;
+    --c-order-item-secondary-text: #555;
+    --c-order-item-border: #ccc;
+    
+    --c-text: #212529; --c-text-muted: #6c757d;
+    --c-bg: #f8f9fa; --c-surface: #ffffff; --c-border: #dee2e6;
+    --c-border-dotted: #e0e0e0;
+    
+    --border-radius: 8px;
+    --shadow: 0 4px 6px rgba(0,0,0,0.05);
+    --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.night-mode {
+    /* Barvy - Noční režim */
+    --c-primary: #2aaa45; --c-primary-hover: #32c453;
+    --c-secondary: #8a939b; --c-secondary-hover: #a2aab1;
+    --c-danger: #e94f5e; --c-danger-hover: #f06a77;
+    --c-warning: #f9a825; --c-warning-hover: #f57f17;
+    
+    --c-blue-tables: #64b5f6;
+    --c-green-tables: #81c784;
+    
+    --c-order-item-bg: #3D7081;
+    --c-order-item-hover-bg: #4A8091;
+    --c-order-item-text: #e0e0e0;
+    --c-order-item-secondary-text: #ccc;
+    --c-order-item-border: #555;
+    
+    --c-text: #e9ecef; --c-text-muted: #adb5bd;
+    --c-bg: #121212; --c-surface: #1e1e1e; --c-border: #343a40;
+    --c-border-dotted: #444;
+}
+
+/* --- ZÁKLADNÍ STYLY --- */
+html {
+    font-size: 100%;
+}
+body {
+    font-family: var(--font-main);
+    margin: 0;
+    background-color: var(--c-bg);
+    color: var(--c-text);
+    padding: 8px 20px 20px 20px;
+    box-sizing: border-box;
+    transition: background-color 0.3s, color 0.3s;
+    min-height: 100vh; 
+}
+
+/* --- HLAVIČKA (Logo + Nadpis) --- */
+.nadpis-wrapper {
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    text-align: center; 
+    position: relative; 
+    margin-bottom: 8px;
+    flex-shrink: 0;
+    min-height: 48px; 
+}
+
+.brand-container {
+    display: flex;
+    align-items: center;
+    gap: 15px; 
+    z-index: 5; 
+}
+
+.brand-logo-img {
+    width: 50px; 
+    height: 50px; 
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    display: block;
+}
+
+.nadpis { 
+    font-size: 1.5em; 
+    font-weight: 700; 
+    color: var(--c-text); 
+    padding: 0; 
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* --- IKONY V HLAVIČCE --- */
+.header-icons-container { 
+    position: absolute; 
+    right: 0; 
+    top: 50%; 
+    transform: translateY(-50%); 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    z-index: 10;
+    height: 100%;
+}
+.header-icon { 
+    cursor: pointer; 
+    color: var(--c-text-muted); 
+    transition: var(--transition); 
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px; 
+    height: 40px; 
+    border-radius: 50%;
+}
+.header-icon:hover { 
+    color: var(--c-text); 
+    background-color: rgba(0,0,0,0.05);
+}
+.night-mode .header-icon:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+.header-icon svg { 
+    width: 24px; 
+    height: 24px; 
+    stroke-width: 2.5; 
+    display: block; 
+}
+.sync-trigger.syncing { color: var(--c-warning); animation: spin 1.5s linear infinite; }
+.sync-trigger.synced { color: var(--c-primary); }
+.sync-trigger.sync-error { color: var(--c-danger); }
+.config-trigger:hover { color: var(--c-info); } 
+
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* --- HLAVNÍ KONTEJNER --- */
+.main-container {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 30px; 
+    background-color: var(--c-surface);
+    padding: 16px 24px 24px 24px; 
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow); border: 1px solid var(--c-border);
+    width: 100%;
+    max-width: 1150px; 
+    margin: 0 auto; 
+    box-sizing: border-box;
+    transition: var(--transition);
+}
+.zone-label {
+    font-size: 0.875em; 
+    color: var(--c-text-muted);
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: 700;
+    border-bottom: none; 
+    height: auto;
+    margin: 0 0 8px 0; 
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s;
+}
+
+/* --- ZÓNA 1: Stoly --- */
+.zone1-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; 
+}
+.upper-tables-grid, .lower-tables-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px; 
+}
+.table {
+    font-size: 1.1em;
+    font-weight: 700;
+    min-height: 55px; 
+    min-width: 80px; 
+    border-radius: 6px; 
+    border: 2px solid transparent;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: var(--transition);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.table:hover { transform: translateY(-2px); box-shadow: 0 6px 10px rgba(0,0,0,0.08); }
+.table:active { transform: translateY(0px) scale(0.98); }
+.table:focus { outline: none; border: 2px solid var(--c-info); }
+.table-lp, .table-lz { background-color: var(--c-green-tables); color: #333; }
+.table-pp, .table-pz { background-color: var(--c-blue-tables); color: #333; }
+.table.selected { border: 2px solid var(--c-primary); }
+.grill-zone-box {
+    padding: 10px 12px;
+    border-radius: 6px; 
+    font-weight: 700;
+    text-align: center;
+    background-color: #e9ecef;
+    color: #495057;
+    border: 1px solid var(--c-border);
+    font-size: 1.1em;
+    min-height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+.open-tables-total-display {
+    background-color: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: 6px; 
+    padding: 15px 10px; 
+    text-align: center;
+    font-size: 1.4em; 
+    font-weight: 700;
+    color: var(--c-text);
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+.open-tables-total-display .label {
+    font-size: 0.6em;
+    font-weight: 500;
+    color: var(--c-text-muted);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    transition: color 0.3s;
+}
+.night-mode .grill-zone-box { background-color: #343a40; color: #adb5bd; border-color: #343a40; }
+.night-mode .table-lp, .night-mode .table-lz { background-color: var(--c-green-tables); color: #333; }
+.night-mode .table-pp, .night-mode .table-pz { background-color: var(--c-blue-tables); color: #333; }
+.table.occupied {
+    opacity: 0.9; background-color: #ffcccc;
+    background-image: repeating-linear-gradient( -45deg, transparent, transparent 4px, rgba(0,0,0,0.1) 4px, rgba(0,0,0,0.1) 8px );
+    border: 1px solid rgba(0,0,0,0.2); color: #000;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s, background-image 0.3s;
+}
+.table.occupied:hover { background-color: #ffb3b3; box-shadow: 0 3px 6px rgba(0,0,0,0.15); }
+.table.selected.occupied { border: 1px solid rgba(0,0,0,0.3); }
+.night-mode .table.occupied {
+    background-color: #ef9a9a;
+    background-image: repeating-linear-gradient( -45deg, transparent, transparent 4px, rgba(255,255,255,0.1) 4px, rgba(255,255,255,0.1) 8px );
+    border-color: rgba(255,255,255,0.3); color: #111;
+}
+.night-mode .table.occupied:hover { background-color: #e57373; }
+.night-mode .table.selected.occupied { border-color: rgba(255,255,255,0.4); }
+
+/* --- ZÓNA 2: Statistiky --- */
+.zone2-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; 
+}
+.info-areas-wrapper {
+    display: flex;
+    gap: 15px; 
+    width: 100%;
+    height: 185px; 
+    flex-shrink: 0;
+}
+.info-area {
+    background-color: var(--c-bg); border: 1px solid var(--c-border);
+    border-radius: var(--border-radius);
+    padding: 16px;
+    font-size: .9em;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-sizing: border-box;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+.info-area-title {
+    font-size: 1em;
+    font-weight: 700;
+    color: var(--c-text);
+    margin: 0 0 16px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--c-border);
+    transition: color 0.3s, border-bottom-color 0.3s;
+    flex-shrink: 0;
+}
+#sold-items-list, #remaining-items-list {
+    flex-grow: 1; overflow-y: auto;
+    padding-right: 5px;
+}
+.info-item-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 6px 0;
+    border-bottom: 1px dotted var(--c-border-dotted);
+    font-size: 0.95em;
+    transition: border-bottom-color 0.3s;
+}
+.info-item-row:last-child { border-bottom: none; }
+.item-name { color: var(--c-text-muted); transition: color 0.3s; }
+.item-value-details { display: inline-flex; align-items: baseline; gap: 8px; text-align: right; }
+.item-count { font-size: 0.9em; color: var(--c-text); min-width: 35px; display: inline-block; text-align: right; font-weight: normal; transition: color 0.3s; }
+.item-value { color: var(--c-text); font-weight: 500; transition: color 0.3s; }
+
+/* #dispatch-area (Layout) */
+#dispatch-area {
+    border: 2px dashed var(--c-border);
+    padding: 10px; 
+    border-radius: var(--border-radius);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px; 
+    overflow-y: auto; 
+    transition: border-color 0.3s;
+    box-sizing: border-box;
+    height: 355px; 
+    align-content: start; 
+}
+
+/* --- ZÓNA 3: Přehled --- */
+.zone3-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; 
+    width: 220px;
+}
+.paid-totals-summary-and-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-grow: 1;
+}
+.summary-line-paid {
+    background-color: var(--c-bg);
+    border: 1px solid var(--c-border);
+    border-radius: 6px; 
+    padding: 10px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+.summary-line-paid span:first-child { color: var(--c-text-muted); transition: color 0.3s; }
+.summary-line-paid span:last-child { font-weight: 700; color: var(--c-text); transition: color 0.3s; }
+.summary-line-paid.total-paid {
+    background-color: var(--c-surface);
+    margin-top: 8px;
+}
+.summary-line-paid.total-paid span:first-child { font-weight: 700; color: var(--c-text); }
+.summary-line-paid.total-paid span:last-child { font-size: 1.1em; }
+.summary-line-paid.on-house-total span { color: var(--c-danger) !important; font-weight: 700; }
+.night-mode .revenue-line.on-house-total span,
+.night-mode .revenue-line.on-house-total strong {
+    color: var(--c-danger) !important;
+}
+
+/* RESPONSIVITA (Layout ONLY) */
+@media (max-width: 1200px) {
+    .main-container {
+        grid-template-columns: auto 1fr;
+        grid-template-rows: auto auto; 
+        gap: 15px;
+        max-width: 95%;
+        padding: 8px 15px 15px 15px; 
+    }
+    .zone3-container {
+        grid-column: 2 / 3;
+        grid-row: 1 / 3; 
+        width: 220px;
+    }
+    .zone1-container { 
+        grid-column: 1 / 2; 
+        grid-row: 1 / 2; 
+    }
+    .zone2-container { 
+        grid-column: 1 / 2; 
+        grid-row: 2 / 3; 
+    }
+    
+    #dispatch-area {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+        height: 355px; 
+    }
+}
+@media (max-width: 900px) {
+    .main-container { 
+        grid-template-columns: 1fr; 
+        grid-template-rows: auto auto auto; 
+        max-width: 100%; 
+        padding: 8px; 
+    }
+    .zone1-container, .zone2-container, .zone3-container { 
+        grid-column: 1 / 2; 
+        width: 100%; 
+        grid-row: auto; 
+    }
+    .info-areas-wrapper { flex-direction: column; height: auto; }
+    .info-area { min-height: 150px; height: auto; }
+    
+    #dispatch-area {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
+        height: 355px; 
+    }
+}
+@media (max-width: 400px) {
+    .nadpis-wrapper { margin-bottom: 10px; }
+    .nadpis { font-size: 1.2em; padding: 0 50px; } 
+    .header-icons-container { gap: 10px; right: 5px; } 
+    .header-icon svg { width: 20px; height: 20px; } 
+    
+    #dispatch-area {
+        grid-template-columns: 1fr;
+        height: 355px; 
+    }
+}

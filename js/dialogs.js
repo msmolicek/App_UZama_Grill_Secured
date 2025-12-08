@@ -3,8 +3,25 @@ import { grillState, saveGrillState } from './state.js';
 import { generateId, formatTimestamp, formatCurrency, getCurrentDateFormatted, showToast } from './utils.js';
 import { calculateAccountTotal, calculateCurrentSoldStock, calculateCurrentRemainingStock, getStockItems, areInitialStocksSet } from './calculations.js';
 import { updateAllDisplays, renderDispatchArea, updateStockDisplay, updateTableVisuals, updateOpenTablesTotalDisplay, updatePaidTotalsDisplay, clearDialogContainer } from './ui.js';
-import { addToSyncQueue, processSyncQueue } from './sync.js';
+import { addToSyncQueue } from './sync.js';
 import { performDataReset } from './state.js';
+
+import { 
+    getConfirmationDialogTemplate, 
+    getWarningDialogTemplate, 
+    getStockNotSetWarningTemplate,
+    getStockInputTemplate,
+    getCustomerDialogTemplate,
+    getMultiAccountDialogTemplate,
+    getOrderDialogTemplate,
+    getGramsDialogTemplate,
+    getPaymentDialogTemplate,
+    getOnTheHouseSplitDialogTemplate,
+    getSplitByItemDialogTemplate,
+    getDispatchConfirmDialogTemplate,
+    getDailyCloseDialogTemplate,
+    getAdminDialogTemplate
+} from './templates.js';
 
 const dialogContainerElement = document.getElementById('dialogContainer');
 
@@ -13,15 +30,13 @@ function closeDialog() {
     clearDialogContainer();
 }
 
-// ZMĚNA: Přidán export, aby tuto funkci viděl app.js
 export function hasOpenTables() { 
     return Object.keys(grillState.tables).length > 0 && Object.values(grillState.tables).some(accounts => accounts.length > 0); 
 }
 
-// --- Logic Functions (Business Logic) ---
+// --- Logic Functions ---
 
 export function handleTableClick(tableId, tableText) {
-    // areInitialStocksSet se nyní importuje z calculations.js
     if (!areInitialStocksSet()) { showStockNotSetWarningDialog(); return; } 
     
     document.querySelectorAll('.table').forEach(t => t.classList.remove('selected'));
@@ -222,15 +237,32 @@ function processPartialPayment(tableId, accountId, itemsToPay, paymentDetails) {
 
 // --- Dialog Display Functions ---
 
+export function showConfirmationDialog(title, message, onConfirm, onCancel = null) {
+    closeDialog();
+    const isGreenAction = (title === 'Vynulovat data?' || title === 'Finální potvrzení');
+    dialogContainerElement.innerHTML = getConfirmationDialogTemplate(title, message, isGreenAction);
+    
+    dialogContainerElement.querySelector('.ok-button').addEventListener('click', () => { 
+        closeDialog();
+        if (onConfirm) onConfirm();
+    });
+    
+    dialogContainerElement.querySelector('.cancel-button').addEventListener('click', () => { 
+        closeDialog();
+        if (onCancel) onCancel();
+    });
+    
+    dialogContainerElement.querySelector('.dialog-overlay').addEventListener('click', (e) => { 
+        if (e.target === e.currentTarget) {
+            closeDialog();
+            if (onCancel) onCancel();
+        }
+    });
+}
+
 export function showStockNotSetWarningDialog() {
     closeDialog();
-    const dialogHTML = `<div class="dialog-overlay"><div class="dialog-box warning-dialog">
-        <p><strong>! POZOR !</strong><br>Nejprve je nutné zadat počáteční stavy</p>
-        <div class="dialog-buttons" style="justify-content: center;">
-            <button class="btn btn--warning ok-button">Zadat stavy</button>
-            <button class="btn btn--secondary cancel-button">Zrušit</button>
-        </div></div></div>`;
-    dialogContainerElement.innerHTML = dialogHTML;
+    dialogContainerElement.innerHTML = getStockNotSetWarningTemplate();
     dialogContainerElement.querySelector('.ok-button').addEventListener('click', () => { closeDialog(); showStockInputDialog(); });
     dialogContainerElement.querySelector('.cancel-button').addEventListener('click', closeDialog);
     dialogContainerElement.querySelector('.dialog-overlay').addEventListener('click', (e) => { if (e.target === e.currentTarget) closeDialog(); });
@@ -238,12 +270,8 @@ export function showStockNotSetWarningDialog() {
 
 export function showOpenTablesWarningDialog() {
     closeDialog();
-    const dialogHTML = `<div class="dialog-overlay"><div class="dialog-box warning-dialog">
-        <p><strong>! POZOR !</strong><br>Nelze provést uzávěrku, dokud jsou otevřené účty na stolech.</p>
-        <div class="dialog-buttons" style="justify-content: center;">
-            <button class="btn btn--primary ok-button">OK</button>
-        </div></div></div>`;
-    dialogContainerElement.innerHTML = dialogHTML;
+    const message = "Nelze provést uzávěrku, dokud jsou otevřené účty na stolech.";
+    dialogContainerElement.innerHTML = getWarningDialogTemplate(message, 'Potvrdit');
     dialogContainerElement.querySelector('.ok-button').addEventListener('click', closeDialog);
     dialogContainerElement.querySelector('.dialog-overlay').addEventListener('click', (e) => { if (e.target === e.currentTarget) closeDialog(); });
 }
@@ -260,14 +288,8 @@ export function showStockInputDialog() {
         if (item.name === "Pečená brambora") { labelHTML = "Pečená<br>brambora"; } 
         formContentHTML += `<div class="stock-item-row"><label for="${inputId}">${labelHTML}:</label><input type="text" inputmode="numeric" pattern="[0-9]*" id="${inputId}" name="${item.id}" value="${currentStock}"><span class="unit-span">${unit}</span></div>`; 
     });
-    const dialogHTML = `<div class="dialog-overlay"><div class="dialog-box" id="stockInputDialog">
-        <h3>Zadání počátečních stavů</h3>
-        <form id="stockInputForm">${formContentHTML}</form>
-        <div class="dialog-buttons">
-            <button class="btn btn--secondary cancel-button">Zrušit</button>
-            <button class="btn btn--primary ok-button">Potvrdit</button>
-        </div></div></div>`;
-    dialogContainerElement.innerHTML = dialogHTML;
+    
+    dialogContainerElement.innerHTML = getStockInputTemplate(formContentHTML);
     const formElement = document.getElementById('stockInputForm');
     const confirmButton = dialogContainerElement.querySelector('.ok-button');
     
@@ -305,16 +327,7 @@ export function showStockInputDialog() {
 
 export function showCustomerDialog(tableId, tableText) {
     closeDialog();
-    const dialogHTML = `<div class="dialog-overlay"><div class="dialog-box" id="customerDialog">
-        <h3>Otevřít první účet: ${tableText}</h3>
-        <div><label for="customerNameInput">Zadej hosta:</label>
-             <input type="text" id="customerNameInput" placeholder="Např. Novákovi" autofocus>
-        </div>
-        <div class="dialog-buttons">
-            <button class="btn btn--secondary cancel-button">Zrušit</button>
-            <button class="btn btn--primary ok-button">Otevři účet</button>
-        </div></div></div>`;
-    dialogContainerElement.innerHTML = dialogHTML;
+    dialogContainerElement.innerHTML = getCustomerDialogTemplate(tableText);
     const inputElement = dialogContainerElement.querySelector('#customerNameInput');
     
     dialogContainerElement.querySelector('.ok-button').addEventListener('click', () => { 
@@ -361,27 +374,7 @@ export function showMultiAccountDialog(tableId) {
     } else { existingAccountsHTML += '<p style="text-align: center; color: var(--c-text-muted); padding: 20px 0;">Na tomto stole nejsou žádné otevřené účty.</p>'; }
     existingAccountsHTML += '</div>';
 
-    const dialogHTML = `<div class="dialog-overlay"><div class="dialog-box multi-account-dialog" id="multiAccountManagerDialog">
-        <h3>Správa účtů pro stůl: ${tableText}</h3>
-        <div class="multi-account-content">
-            <div class="multi-account-new">
-                <h4 class="multi-account-title">Nový účet</h4>
-                <div><label for="newCustomerNameInput">Zadej hosta:</label>
-                     <input type="text" id="newCustomerNameInput" placeholder="Např. Novákovi">
-                </div>
-                <div class="dialog-buttons" style="margin-top: 20px;">
-                    <button class="btn btn--primary open-new-account-button">Otevřít nový účet</button>
-                </div>
-            </div>
-            <div class="multi-account-existing">
-                <h4 class="multi-account-title">Stávající účty (${accounts.length})</h4>
-                ${existingAccountsHTML}
-            </div>
-        </div>
-        <button class="btn btn--secondary multi-account-close-button">Zavřít správu stolu</button>
-    </div></div>`;
-
-    dialogContainerElement.innerHTML = dialogHTML;
+    dialogContainerElement.innerHTML = getMultiAccountDialogTemplate(tableText, accounts.length, existingAccountsHTML);
     const newNameInput = dialogContainerElement.querySelector('#newCustomerNameInput');
     
     dialogContainerElement.querySelector('.open-new-account-button').addEventListener('click', () => {
@@ -407,23 +400,8 @@ export function showOrderDialog(tableId, accountId, customerName, origin = 'unkn
     let orderButtonsHTML = '';
     grillState.menuConfig.forEach(item => { orderButtonsHTML += `<button class="order-item-button category-${item.category}" data-item-id="${item.id}">${item.name} <span class="secondary-text">${item.price} Kč / ${item.type === 'grams' ? '100g' : 'ks'}</span></button>`; });
 
-    const dialogHTML = `<div class="dialog-overlay"><div class="dialog-box" id="orderDialog">
-        <h3>Účet: ${tableText} - ${customerName} (${formattedTime})</h3>
-        <div class="order-items-grid">${orderButtonsHTML}</div>
-        <div id="current-bill">
-            <div class="bill-header">
-                <h4>Položky na tomto účtu:</h4>
-                <button class="btn btn--danger undo-bill-item-button" id="undoLastItemButton">↶ Smazat poslední</button>
-            </div>
-            <div id="bill-items-list"></div>
-            <div id="bill-total">Celkem: 0 Kč</div>
-        </div>
-        <div class="dialog-buttons order-dialog-buttons">
-            <button class="btn btn--secondary order-dialog-action-button" id="closeOrderDialogButton" disabled>Zavřít okno</button>
-            <button class="btn btn--secondary order-dialog-action-button" id="sendToDispatchButton" disabled>Odeslat k výdeji</button>
-        </div></div></div>`;
+    dialogContainerElement.innerHTML = getOrderDialogTemplate(tableText, customerName, formattedTime, orderButtonsHTML);
 
-    dialogContainerElement.innerHTML = dialogHTML;
     if (account) { updateBillDisplay(tableId, accountId); updateOrderDialogButtonStates(tableId, accountId); } else { closeDialog(); return; }
     
     const closeTheDialog = () => { if (origin === 'multiAccountDialog') showMultiAccountDialog(tableId); else closeDialog(); };
@@ -541,20 +519,7 @@ export function showGramsInputDialog(tableId, accountId, itemId, customerName, o
     } else { steakCountHTML = ''; }
 
     closeDialog();
-    const dialogHTML = `<div class="dialog-overlay"><div class="dialog-box" id="gramsDialog">
-        <h3>Zadejte gramáž pro: ${menuItem.name}</h3>
-        <div class="form-field">
-            <label for="gramsInput">Celková gramáž (g):</label>
-             <input type="text" inputmode="numeric" pattern="[0-9]*" id="gramsInput" autofocus>
-        </div>
-        ${steakCountHTML} 
-        ${potatoHTML} 
-        <div class="dialog-buttons">
-            <button class="btn btn--secondary cancel-button">Zrušit</button>
-            <button class="btn btn--primary ok-button">OK</button>
-        </div></div></div>`;
-        
-    dialogContainerElement.innerHTML = dialogHTML;
+    dialogContainerElement.innerHTML = getGramsDialogTemplate(menuItem.name, steakCountHTML, potatoHTML);
     
     const gramsInputElement = document.getElementById('gramsInput');
     const steakCountInputElement = document.getElementById('steakCountInput'); 
@@ -619,23 +584,7 @@ export function showPaymentDialog(tableId, accountId, partialPaymentInfo = null)
     if (totalToPay <= 0 && !isPartialPayment) { showToast('Nelze platit účet s nulovou hodnotou.', 'info'); return; }
     closeDialog();
     
-    const dialogHTML = `<div class="dialog-overlay">
-        <div id="paymentDialog" class="dialog-box">
-            <p>Účet: <strong>${customerName}</strong><br>Celkem k platbě: <strong>${formatCurrency(totalToPay)}</strong></p>
-            <div class="payment-button-row">
-                <button class="btn cash-button">Hotově</button>
-                <button class="btn card-button">Kartou</button>
-                <button class="btn qr-button">QR kódem</button>
-            </div>
-            <div class="payment-button-row">
-                <button class="btn on-the-house-button">Na nás</button>
-                <button class="btn rozuc-button" ${isPartialPayment ? 'disabled title="Funkce není dostupná pro dílčí platbu"' : ''}>Rozúčtování</button>
-            </div>
-            <button class="btn btn--secondary back-button">Zpět</button>
-        </div>
-    </div>`;
-
-    dialogContainerElement.innerHTML = dialogHTML;
+    dialogContainerElement.innerHTML = getPaymentDialogTemplate(customerName, totalToPay, isPartialPayment);
     
     const processPaymentMethod = (method, paymentData = {}) => {
         const paymentDetails = {
@@ -692,27 +641,7 @@ export function showOnTheHouseSplitDialog(tableId, accountId) {
     }); });
     billItemsHTML += '</ul>';
     
-    const dialogHTML = `<div class="dialog-overlay">
-        <div id="onTheHouseSplitDialog" class="dialog-box">
-            <div class="account-summary"><p>Účet: <strong>${account.customerName}</strong></p><p>Celkem: <strong>${formatCurrency(accountTotal)}</strong></p></div>
-            <div class="bill-items-summary">${billItemsHTML}</div>
-            <div class="payment-division">
-                <div class="division-row"><label for="onTheHouseAmountInput">Částka "Na nás":</label><input type="text" inputmode="numeric" pattern="[0-9]*" id="onTheHouseAmountInput" class="split-payment-input" value="${accountTotal}" autofocus></div>
-                <div class="remaining-payment-display">Zbývá zaplatit: <strong id="remainingToPayDisplay">0 Kč</strong></div>
-            </div>
-            <div class="dialog-buttons remaining-payment-actions">
-                <button class="btn cash-button" id="pay-remaining-cash">Hotově</button>
-                <button class="btn card-button" id="pay-remaining-card">Kartou</button>
-                <button class="btn qr-button" id="pay-remaining-qr">QR kódem</button>
-            </div>
-            <div class="dialog-buttons" style="justify-content:center; gap: 15px;">
-                <button class="btn btn--secondary back-button" style="min-width: 140px;">Zpět</button>
-                <button class="btn btn--primary ok-button" id="confirmOnTheHouseFull" style="display: none; min-width: 140px;">Potvrdit</button>
-            </div>
-        </div>
-    </div>`;
-    
-    dialogContainerElement.innerHTML = dialogHTML;
+    dialogContainerElement.innerHTML = getOnTheHouseSplitDialogTemplate(account.customerName, accountTotal, billItemsHTML);
     
     const onTheHouseInput = document.getElementById('onTheHouseAmountInput');
     const remainingDisplay = document.getElementById('remainingToPayDisplay');
@@ -798,22 +727,7 @@ export function showSplitByItemDialog(tableId, accountId) {
         </li>`;
     });
     
-    const dialogHTML = `<div class="dialog-overlay">
-        <div class="dialog-box" id="splitByItemDialog">
-            <h3>Rozúčtování účtu: ${account.customerName}</h3>
-            <p>Vyberte položky, které chcete nyní zaplatit:</p>
-            <ul class="split-items-list">${itemsHTML}</ul>
-            <div class="split-summary">
-                <span class="split-summary-total" id="split-subtotal">Mezisoučet: 0 Kč</span>
-            </div>
-            <div class="dialog-buttons">
-                <button class="btn btn--secondary cancel-button">Zpět</button>
-                <button class="btn btn--primary ok-button" id="pay-selected-items-button" disabled>Zaplatit vybrané</button>
-            </div>
-        </div>
-    </div>`;
-    
-    dialogContainerElement.innerHTML = dialogHTML;
+    dialogContainerElement.innerHTML = getSplitByItemDialogTemplate(account.customerName, itemsHTML);
     
     const subtotalEl = document.getElementById('split-subtotal');
     const payButton = document.getElementById('pay-selected-items-button');
@@ -860,6 +774,7 @@ export function showSplitByItemDialog(tableId, accountId) {
     dialogContainerElement.querySelector('.dialog-overlay').addEventListener('click', (e) => { if (e.target === e.currentTarget) { showPaymentDialog(tableId, accountId); } });
 }
 
+// ZMĚNA: Přidána mezera do stringu položky ('x ')
 export function showDispatchConfirmDialog(tableId, accountId, batchId) {
     closeDialog();
     const account = grillState.tables[tableId]?.find(acc => acc.accountId === accountId);
@@ -870,17 +785,11 @@ export function showDispatchConfirmDialog(tableId, accountId, batchId) {
     const tableElement = document.getElementById(tableId);
     const tableText = tableElement ? tableElement.textContent?.trim() : '';
     const tableIdentifierDisplay = tableText ? `(${tableText})` : '';
-    const batchItemsHTML = batch.items.filter(item => !item.isOther).map(item => `<div class="confirmed-item-row"><span class="confirmed-item-quantity">${item.quantity}x</span><span class="confirmed-item-name">${item.name}</span></div>`).join('');
     
-    const dialogHTML = `<div class="dialog-overlay"><div class="confirm-dialog-box">
-        <p>Opravdu provést výdej pro:<br><strong>${customerName} ${tableIdentifierDisplay}</strong>?</p>
-        <div class="confirmed-items">${batchItemsHTML.length > 0 ? batchItemsHTML : '<p style="color: var(--c-text-muted); font-style:italic;">(Žádné položky k výdeji)</p>'}</div>
-        <div class="dialog-buttons">
-            <button class="btn btn--secondary cancel-button">Zrušit</button>
-            <button class="btn btn--primary ok-button">Potvrdit výdej</button>
-        </div></div></div>`;
-        
-    dialogContainerElement.innerHTML = dialogHTML;
+    // ZDE JSEM PŘIDAL MEZERU za 'x': ${item.quantity}x -> ${item.quantity}x_
+    const batchItemsHTML = batch.items.filter(item => !item.isOther).map(item => `<div class="confirmed-item-row"><span class="confirmed-item-quantity">${item.quantity}x </span><span class="confirmed-item-name">${item.name}</span></div>`).join('');
+    
+    dialogContainerElement.innerHTML = getDispatchConfirmDialogTemplate(customerName, tableIdentifierDisplay, batchItemsHTML);
     
     dialogContainerElement.querySelector('.ok-button').addEventListener('click', () => { 
         const finalBatch = grillState.tables[tableId]?.find(acc => acc.accountId === accountId)?.dispatchBatches?.find(b => b.batchId === batchId); 
@@ -956,33 +865,29 @@ export function showDailyCloseDialog() {
     const revenueTotalHTML = `<p class="total-revenue-line"><span>Celkem:</span> <strong>${formatCurrency(totalRevenueFromState)}</strong></p>`;
     const revenueSectionHTML = `<div class="daily-close-section revenue-summary"><h4>Tržba</h4><div class="daily-close-summary-items">${revenueItemsHTML}</div>${revenueTotalHTML}</div>`;
     
-    const dialogHTML = `<div class="dialog-overlay"><div class="dialog-box" id="dailyCloseDialog">
-        <h3>Denní uzávěrka</h3>
-        <p>Opravdu chcete provést denní uzávěrku za den <strong>${formattedDate}</strong>?<br>
-           <small>Tato akce zařadí uzávěrku do fronty na odeslání a vynuluje lokální data.</small>
-        </p>
-        <div class="daily-close-content-wrapper">${remainingSectionHTML}${soldSectionHTML}${revenueSectionHTML}</div>
-        <div class="dialog-buttons centered-buttons">
-            <button class="btn btn--secondary" id="cancel-daily-close">Zrušit</button>
-            <button class="btn btn--danger" id="confirm-daily-close">Provést uzávěrku a odeslat</button>
-        </div></div></div>`;
-        
-    dialogContainerElement.innerHTML = dialogHTML;
+    dialogContainerElement.innerHTML = getDailyCloseDialogTemplate(formattedDate, remainingSectionHTML + soldSectionHTML + revenueSectionHTML);
     
     dialogContainerElement.querySelector('#confirm-daily-close').addEventListener('click', () => {
-        if (confirm('Opravdu zařadit uzávěrku do fronty? Tato akce je nevratná a vymaže lokální data.')) {
-             const payload = { 
-                 action: "performDailyClose", 
-                 date: formattedDate, 
-                 totals: { cash: totalCashFromState, card: totalCardFromState, qr: totalQRFromState, onHouse: totalOnHouseFromState, totalRevenue: totalRevenueFromState }, 
-                 ...stockDataForServer 
-             };
-             addToSyncQueue(payload); 
-             closeDialog(); 
-             performDataReset(false);
-             showToast('Denní uzávěrka byla zařazena do fronty k odeslání. Lokální data byla vynulována.', 'success');
-             updateAllDisplays();
-        }
+        showConfirmationDialog(
+            'Finální potvrzení', 
+            'Opravdu zařadit uzávěrku do fronty?<br>Tato akce je nevratná.',
+            () => {
+                 const payload = { 
+                     action: "performDailyClose", 
+                     date: formattedDate, 
+                     totals: { cash: totalCashFromState, card: totalCardFromState, qr: totalQRFromState, onHouse: totalOnHouseFromState, totalRevenue: totalRevenueFromState }, 
+                     ...stockDataForServer 
+                 };
+                 addToSyncQueue(payload); 
+                 closeDialog(); 
+                 performDataReset(false);
+                 showToast('Denní uzávěrka byla zařazena do fronty k odeslání. Lokální data byla vynulována.', 'success');
+                 updateAllDisplays();
+            },
+            () => {
+                showDailyCloseDialog();
+            }
+        );
     });
     
     dialogContainerElement.querySelector('#cancel-daily-close').addEventListener('click', closeDialog);
@@ -994,91 +899,25 @@ export function showAdminDialog() {
     let menuItemsHTML = '';
     grillState.menuConfig.forEach(item => { 
         let itemNameHTML = item.name; 
-        if (item.name === "Pečená brambora") { itemNameHTML = "Pečená<br>brambora"; } 
-        menuItemsHTML += `<li class="admin-menu-item" data-item-id="${item.id}"><div class="admin-item-info"><span class="admin-item-name">${itemNameHTML}</span><span class="admin-item-details">${item.price} Kč / ${item.type === 'grams' ? '100g' : 'ks'} (${item.category === 'food' ? 'Jídlo' : 'Ostatní'})</span></div><div class="admin-item-actions"><button class="btn btn--warning admin-edit-button">Upravit</button><button class="btn btn--danger admin-delete-button">Smazat</button></div></li>`; 
+        if (item.name === "Pečená brambora") { itemNameHTML = "Pečená brambora"; } 
+        
+        const unit = item.type === 'grams' ? '100g' : 'ks';
+        const categoryText = item.category === 'food' ? 'Jídlo' : 'Ostatní';
+
+        menuItemsHTML += `
+        <li class="admin-menu-item" data-item-id="${item.id}">
+            <div class="admin-item-info" style="width: 100%;">
+                <span class="admin-item-name">${itemNameHTML}</span>
+                <span class="admin-item-details">
+                    <span class="price-tag">${item.price} Kč / ${unit}</span>
+                    <span class="category-tag">(${categoryText})</span>
+                </span>
+            </div>
+        </li>`; 
     });
     
-    const dialogHTML = `<div class="dialog-overlay"><div class="dialog-box" id="adminDialog">
-        <h3>Správa menu a cen</h3>
-        <ul class="admin-menu-list">${menuItemsHTML}</ul>
-        <div class="dialog-buttons">
-            <button class="btn btn--secondary" id="closeAdminDialog">Zavřít</button>
-            <button class="btn btn--primary" id="addNewMenuItem">Přidat novou položku</button>
-        </div></div></div>`;
-        
-    dialogContainerElement.innerHTML = dialogHTML;
+    dialogContainerElement.innerHTML = getAdminDialogTemplate(menuItemsHTML);
     
     dialogContainerElement.querySelector('#closeAdminDialog').addEventListener('click', closeDialog);
-    dialogContainerElement.querySelector('#addNewMenuItem').addEventListener('click', () => showMenuItemEditDialog(null));
-    
-    dialogContainerElement.querySelectorAll('.admin-edit-button').forEach(btn => btn.addEventListener('click', (e) => { 
-        const itemId = e.target.closest('.admin-menu-item').dataset.itemId; 
-        showMenuItemEditDialog(itemId); 
-    }));
-    
-    dialogContainerElement.querySelectorAll('.admin-delete-button').forEach(btn => btn.addEventListener('click', (e) => { 
-        const itemId = e.target.closest('.admin-menu-item').dataset.itemId; 
-        const item = grillState.menuConfig.find(i => i.id === itemId); 
-        
-        if(confirm(`Opravdu chcete smazat položku "${item.name}"?`)) {
-             grillState.menuConfig = grillState.menuConfig.filter(i => i.id !== itemId); 
-             saveGrillState(); 
-             updateAllDisplays(); 
-             showAdminDialog(); 
-             showToast(`Položka "${item.name}" byla smazána.`, 'success');
-        }
-    }));
-    
     dialogContainerElement.querySelector('.dialog-overlay').addEventListener('click', (e) => { if (e.target === e.currentTarget) closeDialog(); });
-}
-
-function showMenuItemEditDialog(itemId = null) {
-    const isEditing = itemId !== null; 
-    const item = isEditing ? grillState.menuConfig.find(i => i.id === itemId) : {};
-    const title = isEditing ? 'Upravit položku' : 'Přidat novou položku';
-    
-    const dialogHTML = `<div class="dialog-overlay"><div class="dialog-box" id="menuItemEditDialog">
-        <h3>${title}</h3>
-        <form id="menuItemForm">
-            <div class="form-field"><label for="itemName">Název položky:</label><input type="text" id="itemName" value="${item.name || ''}" required></div>
-            <div class="form-field"><label for="itemPrice">Cena (v Kč):</label><input type="text" inputmode="numeric" pattern="[0-9]*" id="itemPrice" value="${item.price || ''}" required></div>
-            <div class="form-field"><label for="itemType">Typ jednotky:</label><select id="itemType"><option value="grams" ${item.type === 'grams' ? 'selected' : ''}>Cena za 100g</option><option value="pieces" ${item.type === 'pieces' ? 'selected' : ''}>Cena za kus</option></select></div>
-            <div class="form-field"><label for="itemCategory">Kategorie:</label><select id="itemCategory"><option value="food" ${item.category === 'food' ? 'selected' : ''}>Jídlo z grilu (sledovat zásoby)</option><option value="other" ${item.category === 'other' ? 'selected' : ''}>Ostatní (nesledovat zásoby)</option></select></div>
-            <div class="dialog-buttons">
-                <button type="button" class="btn btn--secondary cancel-button">Zrušit</button>
-                <button type="submit" class="btn btn--primary ok-button">Uložit</button>
-            </div>
-        </form></div></div>`;
-        
-    dialogContainerElement.innerHTML = dialogHTML;
-    const form = document.getElementById('menuItemForm');
-    
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const updatedItem = { 
-            id: isEditing ? itemId : generateId(), 
-            name: document.getElementById('itemName').value.trim(), 
-            price: parseFloat(document.getElementById('itemPrice').value), 
-            type: document.getElementById('itemType').value, 
-            category: document.getElementById('itemCategory').value, 
-        };
-        
-        if (!updatedItem.name || isNaN(updatedItem.price) || updatedItem.price < 0) { showToast("Zadejte prosím platný název a nezápornou cenu.", 'error'); return; }
-        
-        if (isEditing) { 
-            const index = grillState.menuConfig.findIndex(i => i.id === itemId); 
-            grillState.menuConfig[index] = updatedItem; 
-        } else { 
-            grillState.menuConfig.push(updatedItem); 
-        }
-        
-        saveGrillState(); 
-        updateAllDisplays(); 
-        showAdminDialog(); 
-        showToast(`Položka "${updatedItem.name}" byla uložena.`, 'success');
-    });
-    
-    form.querySelector('.cancel-button').addEventListener('click', showAdminDialog);
-    dialogContainerElement.querySelector('.dialog-overlay').addEventListener('click', (e) => { if (e.target === e.currentTarget) showAdminDialog(); });
-    document.getElementById('itemName').focus();
 }

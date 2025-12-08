@@ -1,0 +1,482 @@
+/* --- DESIGN SYSTEM - COMPONENTS (Buttons, Dialogs, Cards, Toasts) --- */
+
+/* --- SYSTÉM TLAČÍTEK (GLOBÁLNÍ) --- */
+.btn {
+    font-size: 1em; padding: 12px; border: 1px solid transparent; border-radius: 6px;
+    text-align: center; cursor: pointer; display: flex; justify-content: center; align-items: center;
+    font-weight: 700; line-height: 1.2; width: 100%; min-height: 50px;
+    box-sizing: border-box; transition: var(--transition); user-select: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.08); }
+.btn:active:not(:disabled) { transform: translateY(0px) scale(0.98); box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* Varianty tlačítek */
+.btn--primary { background-color: var(--c-primary); color: white; border-color: var(--c-primary); }
+.btn--primary:hover:not(:disabled) { background-color: var(--c-primary-hover); border-color: var(--c-primary-hover); }
+
+.btn--secondary { background-color: var(--c-surface); color: var(--c-secondary); border-color: var(--c-secondary); }
+.btn--secondary:hover:not(:disabled) { background-color: var(--c-secondary); color: white; }
+.night-mode .btn--secondary { background-color: var(--c-surface); color: var(--c-secondary); border-color: var(--c-secondary); }
+.night-mode .btn--secondary:hover:not(:disabled) { background-color: var(--c-secondary-hover); color: var(--c-bg); border-color: var(--c-secondary-hover); }
+
+.btn--tertiary { background-color: transparent; border: none; color: var(--c-text-muted); font-weight: 500; box-shadow: none; }
+.btn--tertiary:hover:not(:disabled) { color: var(--c-text); background-color: var(--c-border); box-shadow: none; transform: none; }
+
+.btn--danger { background-color: var(--c-danger); color: white; border-color: var(--c-danger); }
+.btn--danger:hover:not(:disabled) { background-color: var(--c-danger-hover); border-color: var(--c-danger-hover); }
+
+.btn--warning { background-color: var(--c-warning); color: #333; border-color: var(--c-warning); }
+.btn--warning:hover:not(:disabled) { background-color: var(--c-warning-hover); border-color: var(--c-warning-hover); }
+
+.btn--info { background-color: var(--c-info); color: white; border-color: var(--c-info); }
+.btn--info:hover:not(:disabled) { background-color: var(--c-info-hover); border-color: var(--c-info-hover); }
+
+/* Specifické styly tlačítek v Zóně 3 (Override) */
+.zone3-action-button-wrapper { margin-top: 10px; }
+
+#enter-stock-button.btn { background-color: #ffc107 !important; color: black !important; font-weight: bold !important; border: none !important; }
+#enter-stock-button.btn:hover:not(:disabled) { background-color: #e0a800 !important; }
+.night-mode #enter-stock-button.btn { background-color: #f9a825 !important; color: #000 !important; }
+.night-mode #enter-stock-button.btn:hover:not(:disabled) { background-color: #f57f17 !important; }
+
+#daily-close.btn { background-color: #f44336 !important; color: #fff !important; border: none !important; }
+#daily-close.btn:hover:not(:disabled) { background-color: #e53935 !important; }
+.night-mode #daily-close.btn { background-color: #d32f2f !important; color: #fff !important; }
+.night-mode #daily-close.btn:hover:not(:disabled) { background-color: #c62828 !important; }
+
+#theme-toggle.btn { background-color: #ffffff !important; color: #333 !important; border: 1px solid #ccc !important; font-weight: 700 !important; }
+#theme-toggle.btn:hover:not(:disabled) { background-color: #f0f0f0 !important; }
+.night-mode #theme-toggle.btn { background-color: #4DB6AC !important; color: #fff !important; border: 1px solid #777 !important; }
+.night-mode #theme-toggle.btn:hover:not(:disabled) { background-color: #26a69a !important; }
+
+#reset-local-data.btn {
+    background-color: #e0e0e0 !important; color: #333 !important; border: 1px solid #ccc !important;
+    font-size: 0.9em !important; font-weight: normal !important; box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important; transform: none !important;
+}
+#reset-local-data.btn:hover:not(:disabled) { background-color: #d5d5d5 !important; box-shadow: 0 3px 6px rgba(0,0,0,0.15) !important; transform: translateY(-1px) !important; }
+#reset-local-data.btn:active:not(:disabled) { box-shadow: inset 0 1px 3px rgba(0,0,0,0.2) !important; transform: translateY(1px) !important; }
+.night-mode #reset-local-data.btn { background-color: #616161 !important; color: #f0f0f0 !important; border-color: #777 !important; }
+.night-mode #reset-local-data.btn:hover:not(:disabled) { background-color: #424242 !important; }
+
+
+/* --- KARTY VÝDEJE --- */
+.dispatch-card {
+    background-color: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: 6px; 
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow);
+    height: 160px; 
+    transition: var(--transition);
+    box-sizing: border-box;
+}
+.dispatch-card-header {
+    font-size: 0.95em;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--c-text);
+    transition: color 0.3s;
+    flex-shrink: 0;
+}
+.dispatch-card-header span {
+    font-weight: 400;
+    color: var(--c-text-muted);
+    transition: color 0.3s;
+}
+.dispatch-timer {
+    font-size: 1.1em;
+    font-weight: 700;
+    color: var(--c-text);
+    margin-bottom: 8px;
+    transition: color 0.3s;
+    flex-shrink: 0;
+}
+.dispatch-card-items {
+    font-size: 0.9em;
+    color: var(--c-text-muted);
+    margin-bottom: 8px;
+    overflow-y: auto;
+    max-height: 80px; 
+    flex-grow: 1;
+    transition: color 0.3s;
+}
+.dispatch-card-items p { margin: 0 0 2px 0; padding: 0; }
+.dispatch-card-items span { display: block; margin-bottom: 1px; }
+
+/* Tlačítko Výdej - Červené */
+.dispatch-button {
+    background-color: #E15141; color: white; font-weight: bold; border: none;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 0.9em;
+    cursor: pointer;
+    margin-top: auto;
+    align-self: center;
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+.dispatch-button:hover { background-color: #c44131; }
+.night-mode .dispatch-button { background-color: #D32F2F; color: white; }
+.night-mode .dispatch-button:hover { background-color: #B71C1C; }
+
+.dispatch-card.overdue { border-color: var(--c-danger); background-color: #dc35451a; }
+.dispatch-timer.overdue { color: var(--c-danger); }
+
+
+/* --- DIALOGY (BASE) --- */
+.dialog-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, .6); z-index: 999; display: flex; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; }
+.dialog-box { background-color: var(--c-surface); padding: 24px; border: 1px solid var(--c-border); border-radius: var(--border-radius); box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 1000; display: flex; flex-direction: column; gap: 16px; min-width: 320px; max-width: 550px; max-height: 90vh; overflow-y: auto; transition: background-color 0.3s, border-color 0.3s; }
+.dialog-box h3 { margin: 0 0 10px 0; font-size: 1.3em; font-weight: 700; color: var(--c-text); text-align: center; transition: color 0.3s; }
+.dialog-box p { color: var(--c-text); transition: color 0.3s; line-height: 1.4; }
+.dialog-box p strong { color: var(--c-text); font-weight: 700; transition: color 0.3s; }
+.night-mode .dialog-box p strong { color: var(--c-text); }
+.dialog-box label { display: block; margin-bottom: 5px; font-size: .9em; color: var(--c-text-muted); font-weight: 500; transition: color 0.3s; }
+.dialog-box input[type=text], .dialog-box input[type=number], .dialog-box select { width: 100%; padding: 12px; border: 1px solid var(--c-border); border-radius: 6px; font-size: 1em; box-sizing: border-box; background-color: var(--c-bg); color: var(--c-text); transition: var(--transition); }
+.dialog-box input[type=text]:focus, .dialog-box input[type=number]:focus, .dialog-box select:focus { border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(40,167,69,0.25); outline: none; background-color: var(--c-surface); }
+.form-field { margin-bottom: 15px; }
+.form-field:last-child { margin-bottom: 0; }
+
+/* OPRAVA: TLAČÍTKA V DIALOGOVÝCH OKNECH (ZRUŠENÍ 100% ŠÍŘKY) */
+/* Toto pravidlo zajistí, že v bílých oknech nebudou tlačítka obří */
+.dialog-box .dialog-buttons { 
+    display: flex; 
+    gap: 15px; 
+    margin-top: 16px; 
+    justify-content: center; /* Vždy centrovat */
+    width: 100%;
+}
+
+.dialog-box .dialog-buttons button.btn { 
+    flex-grow: 0 !important; /* Zákaz roztahování */
+    width: auto !important; /* Přebití globálního width: 100% */
+    min-width: 140px; /* Standardní šířka */
+    max-width: 250px; /* Maximální šířka */
+}
+
+/* Warning Dialog */
+.dialog-box.warning-dialog p { text-align: center; font-size: 1.1em; }
+.dialog-box.warning-dialog p strong { color: var(--c-danger); }
+.night-mode .dialog-box.warning-dialog p strong { color: var(--c-danger); }
+
+/* --- SPECIFICKÉ DIALOGY --- */
+
+/* Multi Account Dialog */
+.dialog-box.multi-account-dialog { max-width: 1280px; }
+.multi-account-content { display: flex; gap: 25px; align-items: flex-start; }
+.multi-account-new { flex: 1.2; padding: 20px; background-color: var(--c-bg); border-radius: var(--border-radius); border: 1px solid var(--c-border); display: flex; flex-direction: column; transition: background-color 0.3s, border-color 0.3s; }
+.multi-account-existing { flex: 2.8; padding: 20px; background-color: var(--c-bg); border-radius: var(--border-radius); border: 1px solid var(--c-border); display: flex; flex-direction: column; transition: background-color 0.3s, border-color 0.3s; }
+.multi-account-title { text-align: left; font-size: 1.1em; font-weight: 700; color: var(--c-text); margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid var(--c-border); transition: color 0.3s, border-bottom-color 0.3s; }
+#newCustomerNameInput { max-width: 280px; }
+.existing-accounts-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; max-height: 450px; overflow-y: auto; padding: 5px; margin-top: 0; flex-grow: 1; align-content: start; }
+.existing-account-item { background-color: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--border-radius); padding: 15px; display: flex; flex-direction: column; box-shadow: var(--shadow); transition: var(--transition); position: relative; }
+.existing-account-item:hover { background-color: var(--c-surface); transform: translateY(-2px); box-shadow: 0 6px 10px rgba(0,0,0,0.08); }
+.dispatch-pending-indicator { position: absolute; top: 8px; right: 10px; color: var(--c-warning); font-weight: bold; font-size: 1.2em; z-index: 2; line-height: 1; user-select: none; }
+.night-mode .dispatch-pending-indicator { color: var(--c-warning); }
+.account-card-header { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; margin-bottom: 15px; padding-right: 30px; position: relative; }
+.existing-account-name { font-weight: 700; font-size: 0.95em; color: var(--c-text); transition: color 0.3s; }
+.existing-account-name .timestamp { font-size: 0.8em; font-weight: 400; color: var(--c-text-muted); display: block; margin-top: 1px; transition: color 0.3s; }
+.account-preview-total { font-weight: 700; text-align: left; font-size: 0.95em; white-space: nowrap; margin-left: 0; margin-top: 4px; color: var(--c-text); transition: color 0.3s; }
+.account-card-actions { display: flex; align-items: center; justify-content: center; gap: 8px; padding-top: 10px; margin-top: auto; }
+.account-card-actions button.view-account-button.btn { padding: 8px 10px !important; min-height: 0 !important; font-size: 0.8em !important; border-radius: 6px !important; flex-grow: 1 !important; background-color: var(--c-warning) !important; color: #333 !important; border-color: var(--c-warning) !important; }
+.account-card-actions button.view-account-button.btn:hover:not(:disabled) { background-color: var(--c-warning-hover) !important; border-color: var(--c-warning-hover) !important;}
+.account-card-actions button.pay-account-button.btn { padding: 8px 10px !important; min-height: 0 !important; font-size: 0.8em !important; border-radius: 6px !important; flex-grow: 1 !important; background-color: var(--c-primary) !important; color: white !important; border-color: var(--c-primary) !important; }
+.account-card-actions button.pay-account-button.btn:hover:not(:disabled) { background-color: var(--c-primary-hover) !important; border-color: var(--c-primary-hover) !important; }
+.account-card-actions button.pay-account-button.btn:disabled { background-color: var(--c-secondary) !important; border-color: var(--c-secondary) !important; cursor: not-allowed !important; opacity: 0.6 !important; color: var(--c-text-muted) !important; transform: none !important; box-shadow: none !important; }
+.night-mode .account-card-actions button.pay-account-button.btn:disabled { background-color: var(--c-secondary) !important; border-color: var(--c-secondary) !important; color: var(--c-text-muted) !important; opacity: 0.5 !important; }
+.multi-account-close-button.btn--secondary { margin-top: 20px; align-self: center; flex-grow: 0 !important; max-width: 250px; }
+
+/* Payment Dialog */
+#paymentDialog { max-width: 520px; align-items: center; }
+#paymentDialog .payment-button-row { display: flex; justify-content: center; gap: 15px; width: 100%; }
+#paymentDialog p { text-align: center; font-size: 1.15em; margin-bottom: 5px; line-height: 1.4; }
+#paymentDialog button.btn { padding: 12px 10px !important; border-radius: 6px !important; font-size: 1.05em !important; min-height: 60px !important; flex: 1 1 0 !important; min-width: 0 !important; background-color: #e0e0e0; color: #333; }
+#paymentDialog button.btn:hover:not(:disabled) { background-color: var(--c-primary); color: white; }
+#paymentDialog .back-button.btn--secondary { max-width: 200px !important; margin-top: 10px !important; flex: none !important; }
+.night-mode #paymentDialog button.btn { background-color: #495057; color: var(--c-text); }
+.night-mode #paymentDialog button.btn:hover:not(:disabled) { background-color: var(--c-primary); color: white; }
+
+/* Split Payment Dialog */
+#splitPaymentDialog { gap: 18px; max-width: 450px; }
+#splitPaymentDialog p { text-align: center; font-size: 1.15em; margin-bottom: 5px; }
+#splitPaymentDialog .split-payment-option { display: flex; align-items: center; gap: 10px; }
+#splitPaymentDialog .split-payment-button-styled.btn { border-radius: 6px !important; padding: 10px 15px !important; font-size: 1em !important; flex-shrink: 0 !important; min-width: 75px !important; text-align: center !important; font-weight: bold !important; }
+#splitPaymentDialog .cash-button.split-payment-button-styled { background-color: var(--c-primary) !important; color: white !important; }
+#splitPaymentDialog .card-button.split-payment-button-styled { background-color: var(--c-info) !important; color: white !important; }
+#splitPaymentDialog .split-payment-input { flex-grow: 1; text-align: right; }
+#splitPaymentDialog #remainingAmountDisplay.remaining-amount { font-weight: 700; font-size: 1.05em; transition: color 0.3s; }
+#splitPaymentDialog .remaining-label { font-size: .9em; color: var(--c-text-muted); }
+#splitPaymentDialog .dialog-buttons { justify-content: center; }
+.night-mode #splitPaymentDialog .cash-button.split-payment-button-styled { background-color: var(--c-primary) !important; }
+.night-mode #splitPaymentDialog .card-button.split-payment-button-styled { background-color: var(--c-info) !important; }
+.night-mode #splitPaymentDialog .confirm-split-button:disabled { background-color: #555 !important; color: #aaa !important; }
+
+/* Order Dialog */
+#orderDialog { 
+    max-width: 850px; 
+    max-height: 85vh; 
+    display: flex;
+    flex-direction: column;
+}
+#orderDialog h3 { font-size: 1.15em; flex-shrink: 0; }
+#orderDialog .order-items-grid { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 15px; 
+    margin-top: 10px; 
+    overflow-y: auto; 
+    flex-shrink: 1; 
+}
+#orderDialog .order-item-button { padding: 15px 8px; font-size: 1em; min-height: 65px; line-height: 1.3; border: 1px solid var(--c-order-item-border); border-radius: var(--border-radius); text-align: center; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: var(--transition); background-color: var(--c-order-item-bg); color: var(--c-order-item-text); }
+#orderDialog .order-item-button .secondary-text { font-size: 0.75em; font-weight: 400; margin-top: 2px; display: block; color: var(--c-order-item-secondary-text); }
+#orderDialog .order-item-button:hover { background-color: var(--c-order-item-hover-bg); border-color: var(--c-order-item-border); transform: translateY(-2px); box-shadow: var(--shadow); }
+#orderDialog .order-item-button:active { transform: translateY(0) scale(0.98); box-shadow: inset 0 1px 2px rgba(0,0,0,0.15); }
+
+#current-bill { 
+    margin-top: 20px; 
+    border-top: 1px solid var(--c-border); 
+    padding-top: 15px; 
+    transition: border-top-color 0.3s; 
+    flex-shrink: 0;
+}
+#current-bill .bill-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+#current-bill .bill-header h4 { margin: 0; font-size: 1em; color: var(--c-text); transition: color 0.3s; }
+#orderDialog .undo-bill-item-button.btn { font-size: 0.8em !important; padding: 6px 12px !important; min-height: auto !important; width: auto !important; flex-grow: 0 !important; font-weight: 500 !important; border: none !important; }
+
+/* OPRAVA: Scrollbar pro položky účtu (160px pro menší okno) */
+#bill-items-list { 
+    max-height: 160px !important; 
+    min-height: 80px; 
+    font-size: 0.95em; 
+    border: 1px solid var(--c-border); 
+    background: var(--c-bg); 
+    padding: 8px; 
+    border-radius: 6px; 
+    margin-bottom: 10px; 
+    overflow-y: auto !important; /* Vynucení scrollbaru */
+    transition: border-color 0.3s, background-color 0.3s; 
+}
+
+#bill-items-list ul { list-style: none; padding: 0; margin: 0; }
+#bill-items-list li { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px dotted var(--c-border-dotted); color: var(--c-text); transition: border-bottom-color 0.3s, color 0.3s; }
+#bill-items-list li:last-child { border-bottom: none; }
+#bill-total { font-weight: 700; margin-top: 10px; text-align: right; font-size: 1.1em; color: var(--c-text); transition: color 0.3s; }
+.dialog-buttons.order-dialog-buttons { justify-content: center; gap: 20px; flex-shrink: 0; }
+.dialog-buttons .order-dialog-action-button.btn { min-width: 120px !important; flex-grow: 1 !important; max-width: 220px !important; padding: 12px 15px !important; font-size: 1em !important; }
+
+/* Stock Input Dialog */
+#stockInputDialog .stock-item-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+#stockInputDialog .stock-item-row label { flex-basis: 130px; flex-shrink: 0; text-align: right; margin-bottom: 0; font-size: 1em; color: var(--c-text); transition: color 0.3s; line-height: 1.2; }
+#stockInputDialog .stock-item-row input[type=text] { flex-grow: 1; max-width: 120px; }
+#stockInputDialog .stock-item-row .unit-span { font-size: 0.9em; color: var(--c-text-muted); margin-left: 5px; flex-shrink: 0; min-width: 20px; text-align: left; transition: color 0.3s; }
+#stockInputDialog .dialog-buttons { justify-content: center; gap: 20px; }
+
+/* Daily Close Dialog */
+#dailyCloseDialog { max-width: 750px; }
+#dailyCloseDialog .daily-close-content-wrapper { display: flex; gap: 15px; align-items: stretch; margin-bottom: 20px; }
+#dailyCloseDialog .daily-close-section { flex: 1; background-color: var(--c-bg); border: 1px solid var(--c-border); border-radius: 6px; padding: 12px; display: flex; flex-direction: column; min-width: 180px; transition: background-color 0.3s, border-color 0.3s; }
+#dailyCloseDialog .daily-close-section h4 { margin: 0 0 8px 0; font-size: 1em; text-align: center; border-bottom: 1px solid var(--c-border); padding-bottom: 6px; font-weight: 700; color: var(--c-text); flex-shrink: 0; transition: color 0.3s, border-bottom-color 0.3s; }
+#dailyCloseDialog .daily-close-summary-items { font-size: 0.9em; overflow-y: auto; padding-right: 5px; flex-grow: 1; line-height: 1.4; }
+#dailyCloseDialog .remaining-stock-summary .info-item-row,
+#dailyCloseDialog .sold-items-summary .info-item-row { display: grid; grid-template-columns: 1fr auto auto; gap: 5px; align-items: baseline; border-bottom: 1px dotted var(--c-border-dotted); padding: 3px 0; font-size: inherit; transition: border-bottom-color 0.3s; }
+#dailyCloseDialog .remaining-stock-summary .info-item-row:last-child,
+#dailyCloseDialog .sold-items-summary .info-item-row:last-child { border-bottom: none; }
+#dailyCloseDialog .remaining-stock-summary .item-name,
+#dailyCloseDialog .sold-items-summary .item-name { justify-self: start; color: var(--c-text-muted); margin-right: 0; font-size: inherit; transition: color 0.3s; }
+#dailyCloseDialog .sold-items-summary .item-name { white-space: nowrap; }
+#dailyCloseDialog .sold-items-summary .item-count { font-size: inherit; color: var(--c-text); font-weight: normal; visibility: hidden; padding-right: 5px; text-align: right; transition: color 0.3s; }
+#dailyCloseDialog .sold-items-summary .item-count:not(:empty) { visibility: visible; }
+#dailyCloseDialog .remaining-stock-summary .item-value,
+#dailyCloseDialog .sold-items-summary .item-value { justify-self: end; text-align: right; color: var(--c-text); font-weight: 700; white-space: nowrap; font-size: inherit; transition: color 0.3s; }
+#dailyCloseDialog .revenue-summary .daily-close-summary-items { flex-grow: 0; overflow-y: visible; padding-right: 0; }
+#dailyCloseDialog .revenue-summary p.revenue-line { margin: 0; padding: 3px 0; display: flex; justify-content: space-between; color: var(--c-text); font-size: inherit; border-bottom: 1px dotted var(--c-border-dotted); transition: color 0.3s, border-bottom-color 0.3s; }
+#dailyCloseDialog .revenue-summary p.revenue-line:last-child { border-bottom: none; }
+#dailyCloseDialog .revenue-summary p.revenue-line span { margin-right: 5px; color: var(--c-text-muted); transition: color 0.3s; }
+#dailyCloseDialog .revenue-summary p.revenue-line strong { font-weight: 700; color: var(--c-text); white-space: nowrap; font-size: inherit; text-align: right; transition: color 0.3s; }
+#dailyCloseDialog .revenue-summary p.total-revenue-line { margin: 0; padding: 10px 0 0 0; border-top: 1px solid var(--c-border); margin-top: auto; display: flex; justify-content: space-between; font-size: inherit; transition: border-top-color 0.3s; }
+#dailyCloseDialog .revenue-summary p.total-revenue-line span { margin-right: 5px; font-weight: 700; color: var(--c-text); transition: color 0.3s; }
+#dailyCloseDialog .revenue-summary p.total-revenue-line strong { font-weight: 700; color: var(--c-text); white-space: nowrap; font-size: 1.1em; text-align: right; transition: color 0.3s; }
+#dailyCloseDialog p:first-of-type { text-align: center; font-size: 1.1em; margin-bottom: 15px; color: var(--c-text); transition: color 0.3s; }
+#dailyCloseDialog p:first-of-type strong { font-weight: 700; }
+#dailyCloseDialog p:first-of-type small { font-size: 0.85em; color: var(--c-danger); display: block; margin-top: 5px; font-weight: 400; line-height: 1.3; transition: color 0.3s; }
+#dailyCloseDialog .dialog-buttons.centered-buttons { justify-content: center; gap: 15px; }
+
+/* Admin Dialog */
+#adminDialog { max-width: 950px; } 
+.admin-menu-list { list-style: none; padding: 0; margin: 0 0 20px 0; }
+.admin-menu-item { display: flex; align-items: center; padding: 18px 25px; border-bottom: 1px solid var(--c-border); gap: 25px; }
+.admin-menu-item:last-child { border-bottom: none; }
+.admin-item-info { flex-grow: 1; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+.admin-item-name { font-weight: 700; color: var(--c-text); line-height: 1.3; flex-basis: auto; flex-shrink: 0; font-size: 1.1em; white-space: nowrap; }
+.admin-item-details { font-size: 1em; color: var(--c-text-muted); text-align: right; white-space: nowrap; display: flex; align-items: center; justify-content: flex-end; }
+.price-tag { font-weight: 600; color: var(--c-text); }
+.category-tag { margin-left: 40px; font-weight: 400; color: var(--c-text-muted); }
+.admin-item-actions { display: flex; gap: 10px; }
+.admin-item-actions button.btn { font-size: 0.85em !important; padding: 6px 16px !important; min-width: 80px !important; border-radius: 5px !important; }
+#adminDialog .dialog-buttons { display: flex; justify-content: space-between; }
+
+/* --- CONFIRM DIALOG (Apple Style - Fixed v1.38) --- */
+.confirm-dialog-box {
+    background-color: var(--c-surface);
+    color: var(--c-text);
+    padding: 30px;
+    border: 1px solid var(--c-border);
+    border-radius: 14px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+    width: 90%;
+    max-width: 420px;
+    box-sizing: border-box;
+    animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+.confirm-dialog-box h3 { margin: 0; font-size: 1.6em; font-weight: 700; color: var(--c-danger); line-height: 1.2; }
+.confirm-dialog-box p { margin: 0; font-size: 1.1em; color: var(--c-text); line-height: 1.5; }
+
+/* Fix pro Výdej - zarovnání */
+.confirm-dialog-box .confirmed-items {
+    align-self: center; /* Vycentruje blok v okně */
+    text-align: left;   /* Text uvnitř zarovnán vlevo */
+    display: inline-flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 10px 0;
+    width: auto;
+    min-width: 150px;
+}
+.confirmed-item-row {
+    display: flex;
+    justify-content: flex-start;
+    align-items: baseline;
+    margin-bottom: 3px;
+}
+.confirmed-item-quantity {
+    min-width: 35px;
+    text-align: right;
+    margin-right: 8px;
+    font-weight: 700;
+    flex-shrink: 0;
+    color: var(--c-text);
+}
+.confirmed-item-name {
+    flex-grow: 1;
+    text-align: left;
+    color: var(--c-text);
+}
+
+.confirm-dialog-box .dialog-buttons { display: flex; gap: 15px; width: 100%; margin-top: 10px; justify-content: space-between; }
+/* SPECIFICKÉ PRO CONFIRM DIALOG: Tlačítka se roztahují 50:50 */
+.confirm-dialog-box button.btn { flex: 1 !important; width: 100% !important; padding: 12px 0; font-size: 1.1em; font-weight: 600; border-radius: 10px; min-height: 55px; cursor: pointer; transition: transform 0.1s, background-color 0.2s; }
+.confirm-dialog-box .cancel-button { background-color: transparent !important; border: 2px solid var(--c-border) !important; color: var(--c-text-muted) !important; box-shadow: none !important; }
+.confirm-dialog-box .cancel-button:hover { border-color: var(--c-secondary) !important; color: var(--c-text) !important; background-color: var(--c-bg) !important; }
+.confirm-dialog-box .ok-button { background-color: var(--c-danger) !important; border: none !important; color: white !important; box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3) !important; }
+.confirm-dialog-box .ok-button:hover { background-color: var(--c-danger-hover) !important; transform: translateY(-1px); }
+.confirm-dialog-box .ok-button:active { transform: translateY(1px); }
+
+/* On The House Split Dialog */
+#onTheHouseSplitDialog { max-width: 520px; gap: 18px; }
+#onTheHouseSplitDialog .account-summary { text-align: center; margin-bottom: 5px; }
+#onTheHouseSplitDialog .account-summary p { font-size: 1.1em; line-height: 1.4; margin: 0; }
+#onTheHouseSplitDialog .bill-items-summary { max-height: 120px; overflow-y: auto; border: 1px solid var(--c-border); background-color: var(--c-bg); padding: 10px; border-radius: 6px; font-size: 0.9em; margin-bottom: 10px; }
+#onTheHouseSplitDialog .bill-items-summary ul { list-style: none; margin: 0; padding: 0; }
+#onTheHouseSplitDialog .bill-items-summary li { display: flex; justify-content: space-between; padding: 2px 0; color: var(--c-text); }
+#onTheHouseSplitDialog .payment-division { display: flex; flex-direction: column; gap: 15px; }
+#onTheHouseSplitDialog .division-row { display: flex; align-items: center; gap: 10px; }
+#onTheHouseSplitDialog .division-row label { flex-basis: 120px; flex-shrink: 0; text-align: right; font-weight: 700; font-size: 1em; color: var(--c-text); }
+#onTheHouseSplitDialog .division-row input { flex-grow: 1; text-align: right; font-size: 1.1em; }
+#onTheHouseSplitDialog .remaining-payment-display { padding: 12px; border: 1px solid var(--c-border); border-radius: 6px; background-color: var(--c-bg); text-align: center; color: var(--c-text); }
+#onTheHouseSplitDialog .remaining-payment-display strong { font-size: 1.15em; }
+#onTheHouseSplitDialog .remaining-payment-actions { display: flex; gap: 10px; justify-content: center; }
+#onTheHouseSplitDialog .remaining-payment-actions button.btn { flex-grow: 1 !important; min-width: 0 !important; font-size: 1em !important; padding: 12px 10px !important; background-color: #e0e0e0; color: #333; }
+#onTheHouseSplitDialog .remaining-payment-actions button.btn:hover:not(:disabled) { background-color: var(--c-primary); color: white; }
+#onTheHouseSplitDialog .remaining-payment-actions button.btn:disabled { opacity: 0.6; }
+.night-mode #onTheHouseSplitDialog .remaining-payment-actions button.btn { background-color: #495057; color: var(--c-text); }
+.night-mode #onTheHouseSplitDialog .remaining-payment-actions button.btn:hover:not(:disabled) { background-color: var(--c-primary); color: white; }
+.night-mode #onTheHouseSplitDialog .remaining-payment-actions button.btn:disabled { opacity: 0.5; }
+
+/* Split By Item Dialog */
+#splitByItemDialog { max-width: 600px; }
+.split-items-list { list-style: none; padding: 0; margin: 0; max-height: 40vh; overflow-y: auto; border: 1px solid var(--c-border); border-radius: 6px; background-color: var(--c-bg); }
+.split-item { display: flex; align-items: center; gap: 15px; padding: 10px; border-bottom: 1px dotted var(--c-border-dotted); }
+.split-item:last-child { border-bottom: none; }
+.split-item-checkbox { transform: scale(1.4); margin-left: 5px; flex-shrink: 0; }
+.split-item-details { flex-grow: 1; display: flex; justify-content: space-between; align-items: baseline; }
+.split-item-name { font-size: 1em; color: var(--c-text); }
+.split-item-price { font-size: 1em; font-weight: 700; color: var(--c-text); }
+.split-summary { margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--c-border); text-align: right; }
+.split-summary-total { font-size: 1.2em; font-weight: 700; color: var(--c-text); }
+
+/* Toasts */
+#toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.toast { background-color: var(--c-surface); color: var(--c-text); padding: 15px 40px 15px 20px; border-radius: var(--border-radius); box-shadow: 0 5px 15px rgba(0,0,0,0.1); font-size: 1em; font-weight: 500; display: flex; align-items: center; gap: 10px; transition: transform 0.3s ease, opacity 0.3s ease; opacity: 0; transform: translateX(100%); min-width: 280px; max-width: 350px; border-left: 5px solid var(--c-info); position: relative; }
+.toast.show { opacity: 1; transform: translateX(0); }
+.toast.hide { opacity: 0; transform: translateX(100%); }
+.toast-icon { font-size: 1.4em; font-weight: bold; line-height: 1; color: inherit; }
+.toast.toast-success { border-color: var(--c-primary); }
+.toast.toast-error { border-color: var(--c-danger); }
+.toast.toast-info { border-color: var(--c-info); }
+.toast-close-btn { position: absolute; top: 50%; right: 10px; transform: translateY(-50%); background: transparent; border: none; font-size: 1.6em; color: var(--c-text-muted); cursor: pointer; padding: 0 5px; line-height: 1; transition: color 0.2s ease; }
+.toast-close-btn:hover { color: var(--c-text); }
+.night-mode .toast { background-color: var(--c-surface); color: var(--c-text); }
+.night-mode .toast-close-btn { color: var(--c-text-muted); }
+.night-mode .toast-close-btn:hover { color: var(--c-text); }
+
+/* RESPONSIVITA (Components ONLY) */
+@media (max-width: 1200px) { .existing-accounts-list { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 900px) {
+    .multi-account-content { flex-direction: column; }
+    .existing-accounts-list { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+    #stockInputDialog .stock-item-row { flex-direction: column; align-items: stretch; gap: 5px; }
+    #stockInputDialog .stock-item-row label { text-align: left; flex-basis: auto; min-height: unset; }
+    #stockInputDialog .stock-item-row input[type=text] { max-width: none; }
+    #stockInputDialog .dialog-buttons { flex-direction: column; }
+    #stockInputDialog .stock-item-row .unit-span { margin-left: 0; text-align: right; padding-right: 5px; }
+    #dailyCloseDialog { max-width: 95%; }
+    #dailyCloseDialog .daily-close-content-wrapper { flex-direction: column; gap: 10px; align-items: stretch; }
+    #dailyCloseDialog .daily-close-section { min-width: unset; }
+    #dailyCloseDialog .daily-close-summary-items { max-height: 150px; flex-grow: 1; }
+    #dailyCloseDialog .revenue-summary .daily-close-summary-items { flex-grow: 0; max-height: none; }
+    #dailyCloseDialog .revenue-summary p.total-revenue-line { padding-top: 8px; }
+    #dailyCloseDialog .dialog-buttons { flex-direction: column;}
+    #dailyCloseDialog .dialog-buttons.centered-buttons { gap: 10px; }
+    #newCustomerNameInput { max-width: none !important; }
+}
+@media (max-width: 540px) {
+    #orderDialog .order-items-grid { grid-template-columns: 1fr 1fr; }
+    .dialog-buttons.order-dialog-buttons { flex-direction: row; flex-wrap: wrap; }
+    .dialog-buttons.order-dialog-buttons button { width: auto; margin-bottom: 5px; flex-grow: 1; }
+    .existing-accounts-list { grid-template-columns: 1fr; }
+    .account-card-actions { flex-wrap: wrap; }
+    #toast-container { right: 10px; left: 10px; top: 10px; align-items: center; }
+    .toast { min-width: 0; width: 100%; }
+    #adminDialog { max-width: 95vw !important; }
+    .admin-menu-item { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .admin-item-info { flex-direction: column; align-items: flex-start; gap: 4px; }
+    .admin-item-name { white-space: normal; }
+    .admin-item-details { justify-content: flex-start; width: 100%; }
+    .category-tag { margin-left: 15px; }
+}
+@media (max-width: 480px) {
+    .confirm-dialog-box { padding: 20px; }
+    .confirm-dialog-box h3 { font-size: 1.4em; }
+    .confirm-dialog-box button.btn { font-size: 1em; padding: 14px 0; }
+}
+@media (max-width: 400px) {
+    #dailyCloseDialog .remaining-stock-summary .info-item-row,
+    #dailyCloseDialog .sold-items-summary .info-item-row { grid-template-columns: 1fr auto; gap: 8px; }
+    #dailyCloseDialog .sold-items-summary .item-count { display: none; }
+    #dailyCloseDialog .remaining-stock-summary .item-value,
+    #dailyCloseDialog .sold-items-summary .item-value { grid-column: 2; justify-self: end; }
+    #dailyCloseDialog .revenue-summary p.revenue-line,
+    #dailyCloseDialog .revenue-summary p.total-revenue-line { padding-left: 5px; padding-right: 5px; }
+    #splitPaymentDialog .dialog-buttons { flex-direction: column; align-items: center; gap: 10px; }
+    #splitPaymentDialog .btn.confirm-split-button, #splitPaymentDialog .btn.back-button { width: 100% !important; max-width: 250px !important; }
+    .existing-accounts-list { grid-template-columns: 1fr; }
+}
